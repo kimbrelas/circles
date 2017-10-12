@@ -33,7 +33,7 @@ class GridCircle extends React.Component {
 class Counter extends React.Component {
 	render() {
 		return (
-			<h2>{this.props.count}</h2>
+			<h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{this.props.count} / 10</h2>
 		);
 	}
 }
