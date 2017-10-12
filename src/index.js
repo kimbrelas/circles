@@ -2,39 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Layer, Circle, Stage} from 'react-konva';
 
-class GridCircle extends React.Component {
-	// default to empty status
-	state = { status: 'empty' };
-	
-	// set initial state from props
-	constructor(props) {
-		super(props);
-		
-		this.state = {
-			status: props.initialStatus
-		};
-	}
-	
-	// when a circle is clicked
-	handleClick = () => {
-		// if the circle is not already taken by someone else
-		if(this.state.status !== 'theirs') {
-			var newStatus;
-			
-			if(this.state.status === 'mine') {
-				// if the circle was mine, make it empty
-				newStatus = 'empty';
-			} else {
-				// if the circle was empty, make it mine
-				newStatus = 'mine';
-			}
-			
-			this.setState({
-				status: newStatus
-			});
-		}
-	}
-	
+class GridCircle extends React.Component {	
 	// get the circle color for the current status
 	getColor = () => {
 		var statusColor = {
@@ -43,7 +11,7 @@ class GridCircle extends React.Component {
 			'theirs': '#ADD8E6'
 		};
 		
-		return statusColor[this.state.status];
+		return statusColor[this.props.status];
 	}
 	
 	// render a single circle
@@ -55,9 +23,17 @@ class GridCircle extends React.Component {
 				width={40}
 				height={40}
 				fill={this.getColor()}
-				onClick={this.handleClick}
-				onTouchStart={this.handleClick}
+				onClick={() => this.props.handleClick(this)}
+				onTouchStart={() => this.props.handleClick(this)}
 			/>
+		);
+	}
+}
+
+class Counter extends React.Component {
+	render() {
+		return (
+			<h2>{this.props.count}</h2>
 		);
 	}
 }
@@ -293,20 +269,64 @@ class App extends React.Component {
 		]
 	};
 	
+	countMine = () => {
+		var count = 0;
+		
+		for(var i = 0; i < this.state.circles.length; i++) {
+			if(this.state.circles[i].status === 'mine') {
+				count++;
+			}
+		}
+		
+		return count;
+	};
+	
+	// when a circle is clicked
+	handleCircleClick = (gridCircle) => {
+		var circles = this.state.circles;
+		var key = gridCircle.props.id;
+		
+		// if the circle is not already taken by someone else
+		if(circles[key].status !== 'theirs') {
+			if(circles[key].status === 'mine') {
+				// if the circle was mine, make it empty
+				circles[key].status = 'empty';
+			} else {
+				// if the user has selected less than 10 circles
+				if(this.countMine() < 10) {
+					// if the circle was empty, make it mine
+					circles[key].status = 'mine';
+				} else {
+					alert('Whoa there! Let\'s not get greedy, now.');
+					return;
+				}
+			}
+			
+			this.setState({
+				circles: circles
+			});
+		} else {
+			alert('Looks like someone else has already staked a claim this circle.');
+		}
+	}
+	
 	// render canvas & all circles
 	render() {
 		// loop over circles array and add each to the canvas
-		var circles = this.state.circles.map(function(circle) {
-			return <GridCircle key={'x'+circle.x+'y'+circle.y} initialStatus={circle.status} x={circle.x*50} y={circle.y*50} />;
-		});
+		var circles = this.state.circles.map(function(circle,key) {
+			return <GridCircle key={key} id={key} status={circle.status} x={circle.x*50} y={circle.y*50} handleClick={this.handleCircleClick} />;
+		}.bind(this));
 		
 		// output canvas
 		return (
-			<Stage width={1300} height={500}>
-				<Layer>
-					{circles}
-				</Layer>
-			</Stage>
+			<div>
+				<Stage width={1300} height={500}>
+					<Layer>
+						{circles}
+					</Layer>
+				</Stage>
+				<Counter count={this.countMine()} />
+			</div>
 		);
 	}
 }
