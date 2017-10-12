@@ -4,10 +4,10 @@ Users can access a URL and select up to 10 circles from the screen. Other users 
 ### Users see:
 
 - Circles:
-  - Their selected circles in dark blue
+  - ~~Their selected circles in dark blue~~
   - Others selected circles in light blue
-  - Available circles in gray
-- Countdown of their selected circles out of 10
+  - ~~Available circles in gray~~
+- ~~Countdown of their selected circles out of 10~~
 - A running tally of number of users online (optional)
 - Brief help messages to figure out the game (optional)
 - Ability to swipe on mobile and desktop to navigate the drawing (optional)
