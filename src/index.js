@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom';
 import {Layer, Rect, Circle, Stage} from 'react-konva';
 var ReactToastr = require("react-toastr");
 var {ToastContainer} = ReactToastr;
-
 var ToastMessageFactory = React.createFactory(ReactToastr.ToastMessage.animation);
+
+import { subscribeToTimer } from './api';
 
 class GridCircle extends React.Component {	
 	// get the circle color for the current status
@@ -47,8 +48,11 @@ class App extends React.Component {
 	
 	constructor() {
 		super();
-		
+
+		subscribeToTimer((err, timestamp) => this.setState({timestamp}));
+
 		this.state = {
+			timestamp: 'no timestamp yet',
 			canvas: this.getCanvas(),
 			circles: [
 				{ status:'empty', x:1, y:1 },
@@ -242,7 +246,7 @@ class App extends React.Component {
 		} else {
 			this.toastr.warning(
 				null,
-				"Looks like someone else has already staked a claim this circle.", {
+				"Looks like someone else has already staked a claim to this circle.", {
 				timeOut: 3000,
 				extendedTimeOut: 3000
 		    });
@@ -264,7 +268,8 @@ class App extends React.Component {
 						<Rect x={0} y={0} width={this.state.canvas.width} height={this.state.canvas.height} fill={'#f5f5f5'} />
 						{circles}
 					</Layer>
-				</Stage>		
+				</Stage>
+				<h6>{this.state.timestamp}</h6>	
 				<Counter count={this.countMine()} />
 				<ToastContainer ref={(input) => {this.toastr = input;}} toastMessageFactory={ToastMessageFactory} className={"toast-top-right"} />
 			</div>
