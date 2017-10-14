@@ -3,7 +3,7 @@ Users can access a URL and select up to 10 circles from the screen. Other users 
 
 ### Users see:
 
-- Circles:~~
+- Circles:
   - Their selected circles in dark blue
   - Others selected circles in light blue
   - Available circles in gray
