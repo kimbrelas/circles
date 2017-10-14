@@ -14,16 +14,25 @@ for(var x = 1;x <= 15;x++) {
 	}
 }
 
+// clear out orphaned circles once per minute
+setInterval(function() {
+	for(var i = 0; i < circles.length; i++) {
+		if(circles[i].playerId !== null && players.indexOf(circles[i].playerId) <= -1) {
+			circles[i].playerId = null;
+			io.sockets.emit('toggledCircle',{circles:circles});
+			console.log('removed circle '+i+' for player '+circles[i].playerId);
+		}
+	}
+}, 60000);
+
 io.on('connection', (client) => {
 	// player joins game
     client.on('joinGame', () => {
 	    players.push(client.id);
+	    
+        client.emit('joinedGame',{playerId:client.id,circles:circles,playerCount:players.length});
         
-        console.log('player '+client.id+' is joining game');
-        
-        client.emit('joinedGame',{playerId:client.id,circles:circles});
-        
-        io.sockets.emit('playerJoined',{playerCount:players.length});
+        client.broadcast.emit('playerJoined',{playerCount:players.length});
     });
     
     // player toggles circle
@@ -51,7 +60,7 @@ io.on('connection', (client) => {
 				}
 			}
 		
-		    io.sockets.emit('playerQuit',{circles:circles,playerCount:players.length});
+		    client.broadcast.emit('playerQuit',{circles:circles,playerCount:players.length});
 	    }
     });
 });

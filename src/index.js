@@ -31,7 +31,8 @@ class App extends React.Component {
 	constructor() {
 		super();
 		
-		joinGame((data) => this.setState(data));
+		// join game and route data to callbacks below
+		joinGame((callback,data) => this[callback](data)); 
 		
 		this.state = {
 			canvas:   this.getCanvas(),
@@ -41,6 +42,7 @@ class App extends React.Component {
 		};
 	}
 	
+	// responsive canvas
 	getCanvas = () => {
 		var container = document.getElementById('container');
 		var styles    = window.getComputedStyle(container);
@@ -61,14 +63,54 @@ class App extends React.Component {
 		});
 	};
 	
+	// callbacks
+	playerJoined = (data) => {
+		this.setState(data);
+		
+		this.toastr.success(
+			null,
+			"Player Joined.", {
+			timeOut: 1000,
+			extendedTimeOut: 1000
+	    });
+	};
+	
+	playerQuit = (data) => {
+		this.setState(data);
+		
+		this.toastr.success(
+			null,
+			"Player Left.", {
+			timeOut: 1000,
+			extendedTimeOut: 1000
+	    });
+	};
+	
+	toggledCircle = (data) => {
+		this.setState(data);
+	};
+	
+	joinedGame = (data) => {
+		this.setState(data);
+		
+		this.toastr.success(
+			null,
+			"Welcome to Round Up 10. Tap any available circle to begin. Light blue circles have already been claimed by other players.", {
+			timeOut: 6000,
+			extendedTimeOut: 6000,
+			closeButton: true
+	    });
+	};
+	
+	// responsive canvas
 	componentDidMount() {
 		window.addEventListener("resize", this.updateCanvas.bind(this));
 	}
-	
 	componentWillUnmount() {
 		window.removeEventListener("resize", this.updateCanvas.bind(this));
 	}
 	
+	// returns a count of this player's selected circles
 	countMine = () => {
 		var count = 0;
 		
@@ -81,6 +123,7 @@ class App extends React.Component {
 		return count;
 	};
 	
+	// returns the color the circle should be for this player
 	getCircleColor = (circlePlayerId) => {
 		var color;
 		
@@ -112,7 +155,7 @@ class App extends React.Component {
 				// if
 				this.toastr.warning(
 					null,
-					"Whoa there! Let's not get greedy, now.", {
+					"Whoa there! You've already got 10 circles. Let's not get greedy, now.", {
 					timeOut: 3000,
 					extendedTimeOut: 3000
 			    });
@@ -141,7 +184,7 @@ class App extends React.Component {
 			<div>
 				<div className="row">
 					<div className="five columns">
-						<h1>Circles</h1>
+						<h1>Round Up 10</h1>
 					</div>
 				</div>
 				<div className="row">		
