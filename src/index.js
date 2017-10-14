@@ -6,7 +6,7 @@ var {ToastContainer} = ReactToastr;
 var ToastMessageFactory = React.createFactory(ReactToastr.ToastMessage.animation);
 
 import { joinGame } from './api';
-import { claimCircle } from './api';
+import { toggleCircle } from './api';
 
 class GridCircle extends React.Component {	
 	// render a single circle
@@ -25,35 +25,19 @@ class GridCircle extends React.Component {
 	}
 }
 
-class Counter extends React.Component {
-	render() {
-		return (
-			<h6>{this.props.count} / 10 Selected</h6>
-		);
-	}
-}
-
-class PlayerCount extends React.Component {
-	render() {
-		return (
-			<h6>{this.props.count} Players Online</h6>
-		);
-	}
-}
-
 class App extends React.Component {
 	state = {};
 	
 	constructor() {
 		super();
 		
-		joinGame((err, data) => this.setState(data));
+		joinGame((data) => this.setState(data));
 		
 		this.state = {
 			canvas:   this.getCanvas(),
 			circles:  [],
 			playerId: null,
-			playerCount: 0
+			playerCount: 1
 		};
 	}
 	
@@ -119,11 +103,11 @@ class App extends React.Component {
 		var circles = this.state.circles;
 		
 		if(circles[key].playerId === this.state.playerId) {
-			claimCircle(key);
+			toggleCircle(key);
 		} else if(circles[key].playerId === null) {
 			// if the circle was empty and the user has selected less than 10 circles, make it mine
 			if(this.countMine() < 10) {
-				claimCircle(key);
+				toggleCircle(key);
 			} else {
 				// if
 				this.toastr.warning(
@@ -154,17 +138,29 @@ class App extends React.Component {
 		
 		// output canvas
 		return (
-			<div className="row">		
-				<Stage width={this.state.canvas.width} height={this.state.canvas.height}>
-					<Layer>
-						<Rect x={0} y={0} width={this.state.canvas.width} height={this.state.canvas.height} fill={'#f5f5f5'} />
-						{circles}
-					</Layer>
-				</Stage>
-				<h6>{this.state.timestamp}</h6>	
-				<Counter count={this.countMine()} />
-				<PlayerCount count={this.state.playerCount} />
-				<ToastContainer ref={(input) => {this.toastr = input;}} toastMessageFactory={ToastMessageFactory} className={"toast-top-right"} />
+			<div>
+				<div className="row">
+					<div className="five columns">
+						<h1>Circles</h1>
+					</div>
+				</div>
+				<div className="row">		
+					<Stage width={this.state.canvas.width} height={this.state.canvas.height}>
+						<Layer>
+							<Rect x={0} y={0} width={this.state.canvas.width} height={this.state.canvas.height} fill={'#f5f5f5'} />
+							{circles}
+						</Layer>
+					</Stage>
+					<h6>{this.state.timestamp}</h6>
+					<ToastContainer ref={(input) => {this.toastr = input;}} toastMessageFactory={ToastMessageFactory} className={"toast-top-right"} />
+				</div>
+				<div className="row">
+					<div className="five columns">
+						<small>Circles: {this.countMine()} / 10</small>
+						<br />
+						<small>Players: {this.state.playerCount}</small>
+					</div>
+				</div>
 			</div>
 		);
 	}

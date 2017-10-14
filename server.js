@@ -1,8 +1,10 @@
 const io = require('socket.io')();
 
+// player database
 var players = [];
-var circles = [];
 
+// circle database
+var circles = [];
 for(var x = 1;x <= 15;x++) {
 	for(var y = 1;y <= 8;y++) {
 		var statuses = ['theirs','mine','empty'];
@@ -13,6 +15,7 @@ for(var x = 1;x <= 15;x++) {
 }
 
 io.on('connection', (client) => {
+	// player joins game
     client.on('joinGame', () => {
 	    players.push(client.id);
         
@@ -23,7 +26,8 @@ io.on('connection', (client) => {
         io.sockets.emit('playerJoined',{playerCount:players.length});
     });
     
-    client.on('claimCircle', (key) => {
+    // player toggles circle
+    client.on('toggleCircle', (key) => {
 	    var circle = circles[key];
 	    
 	    if(circle.playerId === null) {
@@ -32,10 +36,10 @@ io.on('connection', (client) => {
 		    circles[key].playerId = null;
 	    }
 	    
-	    io.sockets.emit('claimedCircle',{circles:circles});
+	    io.sockets.emit('toggledCircle',{circles:circles});
     });
     
-    // remove client on disconnect
+    // player quits game
     client.on('disconnect', () => {
 	    var playerIndex = players.indexOf(client.id);
 	    if(playerIndex > -1) {
